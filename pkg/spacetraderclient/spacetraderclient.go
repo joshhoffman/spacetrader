@@ -7,7 +7,7 @@ import (
 	"github.com/joshhoffman/spacetrader/pkg/client"
 )
 
-type request interface{}
+type requestInterface interface{}
 
 type RegisterRequest struct {
 	Symbol  string `json:"symbol"`
@@ -17,10 +17,11 @@ type RegisterRequest struct {
 type SpaceTraderClient struct {
 	client   client.Client
 	Callsign string
+	Token    string
 }
 
-func (s SpaceTraderClient) init() {
-	s.client = client.Client{Url: "https://api.spacetraders.io/v2/"}
+func (s *SpaceTraderClient) Init() {
+	s.client = client.MakeClient("https://api.spacetraders.io/v2/", s.Token)
 }
 
 func (s SpaceTraderClient) Register(faction string) {
@@ -33,7 +34,11 @@ func (s SpaceTraderClient) Register(faction string) {
 	println(resBody)
 }
 
-func getBodyBytes(r request) ([]byte, error) {
+func (s SpaceTraderClient) Agent() {
+	s.client.MakeGetRequest("my/agent")
+}
+
+func getBodyBytes(r *RegisterRequest) ([]byte, error) {
 	request, err := json.Marshal(r)
 	if err != nil {
 		fmt.Println("Error")

@@ -9,7 +9,39 @@ import (
 )
 
 type Client struct {
-	Url string
+	Url    string
+	Token  string
+	client http.Client
+}
+
+func (c Client) MakeGetRequest(endpoint string) (string, error) {
+	requestUrl := fmt.Sprintf("%s%s", c.Url, endpoint)
+	fmt.Println(requestUrl)
+
+	req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
+	if err != nil {
+		fmt.Println("Error making request")
+		return "", err
+	}
+
+	authHeader := fmt.Sprintf("Bearer %s", c.Token)
+	req.Header.Set("Authorization", authHeader)
+	req.Header.Set("Content-Type", "application/json")
+
+	res, err := c.client.Do(req)
+	if err != nil {
+		fmt.Printf("Error sending request %s\n", err)
+		return "", err
+	}
+
+	resBody, err := GetBody(res)
+	if err != nil {
+		fmt.Println("Error reading body")
+		return "", err
+	}
+
+	fmt.Println(resBody)
+	return resBody, nil
 }
 
 func (c Client) MakePostRequest(endpoint string, body []byte) (string, error) {
@@ -23,20 +55,33 @@ func (c Client) MakePostRequest(endpoint string, body []byte) (string, error) {
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	client := http.Client{
-		Timeout: 30 * time.Second,
-	}
-
-	res, err := client.Do(req)
+	res, err := c.client.Do(req)
 	if err != nil {
-		fmt.Println("Error ending request")
+		fmt.Printf("Error sending request %s\n", err)
 		return "", err
 	}
-	resBody, err := ioutil.ReadAll(res.Body)
+
+	resBody, err := GetBody(res)
 	if err != nil {
 		fmt.Println("Error reading body")
 		return "", err
 	}
 
+	return resBody, nil
+}
+
+func GetBody(body *http.Response) (string, error) {
+	resBody, err := ioutil.ReadAll(body.Body)
+	if err != nil {
+		fmt.Println("Error reading body")
+		return "", err
+	}
 	return string(resBody), nil
+}
+
+func MakeClient(url string, token string) Client {
+	client := http.Client{
+		Timeout: 30 * time.Second,
+	}
+	return Client{Url: url, Token: token, client: client}
 }
