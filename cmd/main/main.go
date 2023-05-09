@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/joshhoffman/spacetrader/pkg/server"
 	"github.com/joshhoffman/spacetrader/pkg/spacetraderclient"
 )
 
@@ -14,10 +15,13 @@ type RegisterRequest struct {
 }
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		fmt.Println("Error reading .env")
-		return
+	_, present := os.LookupEnv("DEBUG")
+	if !present {
+		err := godotenv.Load(".env")
+		if err != nil {
+			fmt.Println("Error reading .env")
+			return
+		}
 	}
 
 	callsign := os.Getenv("CALLSIGN")
@@ -27,7 +31,6 @@ func main() {
 	c.Init()
 	c.Ships()
 
-	// s := server.Server{}
-	// s.StartServer()
-	// time.Sleep(time.Second * 10)
+	s := server.Server{}
+	s.StartServer()
 }

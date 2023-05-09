@@ -82,13 +82,16 @@ func (s SpaceTraderClient) Waypoints(systemId string) {
 	fmt.Printf("%+v\n", resp)
 }
 
-func (s SpaceTraderClient) Ships() {
+func (s SpaceTraderClient) Ships() (*responses.ShipsResponse, error) {
 	resp, err := s.client.MakeGetRequest("my/ships", new(responses.ShipsResponse))
 	if err != nil {
 		fmt.Printf("Error in contracts %s\n", err)
-		return
+		return nil, err
 	}
+	ret := resp.(responses.ShipsResponse)
 	fmt.Printf("%+v\n", resp)
+
+	return &ret, nil
 }
 
 func getBodyBytes(r *RegisterRequest) ([]byte, error) {
