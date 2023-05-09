@@ -25,6 +25,9 @@ func main() {
 
 	c := spacetraderclient.SpaceTraderClient{Callsign: callsign, Token: token}
 	c.Init()
-	// c.Register("COSMIC")
 	c.Agent()
+
+	// s := server.Server{}
+	// s.StartServer()
+	// time.Sleep(time.Second * 10)
 }

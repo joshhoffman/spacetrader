@@ -14,14 +14,14 @@ type Client struct {
 	client http.Client
 }
 
-func (c Client) MakeGetRequest(endpoint string) (string, error) {
+func (c Client) MakeGetRequest(endpoint string, responseObject MarshalableObject) (MarshalableObject, error) {
 	requestUrl := fmt.Sprintf("%s%s", c.Url, endpoint)
 	fmt.Println(requestUrl)
 
 	req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
 		fmt.Println("Error making request")
-		return "", err
+		return nil, err
 	}
 
 	authHeader := fmt.Sprintf("Bearer %s", c.Token)
@@ -31,17 +31,18 @@ func (c Client) MakeGetRequest(endpoint string) (string, error) {
 	res, err := c.client.Do(req)
 	if err != nil {
 		fmt.Printf("Error sending request %s\n", err)
-		return "", err
+		return nil, err
 	}
 
 	resBody, err := GetBody(res)
 	if err != nil {
 		fmt.Println("Error reading body")
-		return "", err
+		return nil, err
 	}
 
-	fmt.Println(resBody)
-	return resBody, nil
+	responseObject, err = responseObject.Unmarshal(resBody)
+
+	return responseObject, err
 }
 
 func (c Client) MakePostRequest(endpoint string, body []byte) (string, error) {
@@ -67,16 +68,16 @@ func (c Client) MakePostRequest(endpoint string, body []byte) (string, error) {
 		return "", err
 	}
 
-	return resBody, nil
+	return string(resBody), nil
 }
 
-func GetBody(body *http.Response) (string, error) {
+func GetBody(body *http.Response) ([]byte, error) {
 	resBody, err := ioutil.ReadAll(body.Body)
 	if err != nil {
 		fmt.Println("Error reading body")
-		return "", err
+		return nil, err
 	}
-	return string(resBody), nil
+	return resBody, nil
 }
 
 func MakeClient(url string, token string) Client {

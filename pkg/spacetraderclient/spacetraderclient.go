@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/joshhoffman/spacetrader/pkg/client"
+	"github.com/joshhoffman/spacetrader/pkg/spacetraderclient/responses"
 )
 
 type requestInterface interface{}
@@ -35,7 +36,50 @@ func (s SpaceTraderClient) Register(faction string) {
 }
 
 func (s SpaceTraderClient) Agent() {
-	s.client.MakeGetRequest("my/agent")
+	resp, err := s.client.MakeGetRequest("my/agent", new(responses.AgentResponse))
+	if err != nil {
+		fmt.Printf("Error in agent %s\n", err)
+		return
+	}
+	fmt.Printf("%+v\n", resp)
+}
+
+func (s SpaceTraderClient) Factions() {
+	resp, err := s.client.MakeGetRequest("factions", new(responses.FactionsResponse))
+	if err != nil {
+		fmt.Printf("Error in factions %s\n", err)
+		return
+	}
+	fmt.Printf("%+v\n", resp)
+}
+
+func (s SpaceTraderClient) Contracts() {
+	resp, err := s.client.MakeGetRequest("my/contracts", new(responses.ContractResponse))
+	if err != nil {
+		fmt.Printf("Error in contracts %s\n", err)
+		return
+	}
+	fmt.Printf("%+v\n", resp)
+	// contractResponse, err := responses.UnmarshalWelcome(resp)
+}
+
+func (s SpaceTraderClient) Systems() {
+	resp, err := s.client.MakeGetRequest("systems", new(responses.SystemsResponse))
+	if err != nil {
+		fmt.Printf("Error in contracts %s\n", err)
+		return
+	}
+	fmt.Printf("%+v\n", resp)
+}
+
+func (s SpaceTraderClient) Waypoints(systemId string) {
+	urlPath := fmt.Sprintf("systems/%s/waypoints", systemId)
+	resp, err := s.client.MakeGetRequest(urlPath, new(responses.WaypointsResponse))
+	if err != nil {
+		fmt.Printf("Error in contracts %s\n", err)
+		return
+	}
+	fmt.Printf("%+v\n", resp)
 }
 
 func getBodyBytes(r *RegisterRequest) ([]byte, error) {
