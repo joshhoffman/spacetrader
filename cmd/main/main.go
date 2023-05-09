@@ -25,7 +25,7 @@ func main() {
 
 	c := spacetraderclient.SpaceTraderClient{Callsign: callsign, Token: token}
 	c.Init()
-	c.Agent()
+	c.Ships()
 
 	// s := server.Server{}
 	// s.StartServer()

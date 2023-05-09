@@ -40,6 +40,8 @@ func (c Client) MakeGetRequest(endpoint string, responseObject MarshalableObject
 		return nil, err
 	}
 
+	// println(string(resBody))
+
 	responseObject, err = responseObject.Unmarshal(resBody)
 
 	return responseObject, err
