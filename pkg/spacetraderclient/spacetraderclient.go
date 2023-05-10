@@ -5,15 +5,11 @@ import (
 	"fmt"
 
 	"github.com/joshhoffman/spacetrader/pkg/client"
+	"github.com/joshhoffman/spacetrader/pkg/spacetraderclient/requests"
 	"github.com/joshhoffman/spacetrader/pkg/spacetraderclient/responses"
 )
 
 type requestInterface interface{}
-
-type RegisterRequest struct {
-	Symbol  string `json:"symbol"`
-	Faction string `json:"faction"`
-}
 
 type SpaceTraderClient struct {
 	client   client.Client
@@ -26,12 +22,30 @@ func (s *SpaceTraderClient) Init() {
 }
 
 func (s SpaceTraderClient) Register(faction string) {
-	register := &RegisterRequest{Symbol: s.Callsign, Faction: "COSMIC"}
+	register := &requests.RegisterRequest{Symbol: s.Callsign, Faction: "COSMIC"}
 	registerBytes, err := getBodyBytes(register)
 	if err != nil {
 		return
 	}
-	resBody, err := s.client.MakePostRequest("register", registerBytes)
+	resBody, err := s.client.MakePostRequest("register", registerBytes, nil)
+	println(resBody)
+}
+
+func (s SpaceTraderClient) Orbit(shipId string) {
+	urlPath := fmt.Sprintf("my/ships/%s/orbit", shipId)
+	resBody, err := s.client.MakePostRequest(urlPath, nil, new(responses.OrbitResponse))
+	if err != nil {
+		return
+	}
+	println(resBody)
+}
+
+func (s SpaceTraderClient) Dock(shipId string) {
+	urlPath := fmt.Sprintf("my/ships/%s/dock", shipId)
+	resBody, err := s.client.MakePostRequest(urlPath, nil, new(responses.OrbitResponse))
+	if err != nil {
+		return
+	}
 	println(resBody)
 }
 
@@ -89,12 +103,12 @@ func (s SpaceTraderClient) Ships() (*responses.ShipsResponse, error) {
 		return nil, err
 	}
 	ret := resp.(responses.ShipsResponse)
-	fmt.Printf("%+v\n", resp)
+	// fmt.Printf("%+v\n", resp)
 
 	return &ret, nil
 }
 
-func getBodyBytes(r *RegisterRequest) ([]byte, error) {
+func getBodyBytes(r *requests.RegisterRequest) ([]byte, error) {
 	request, err := json.Marshal(r)
 	if err != nil {
 		fmt.Println("Error")

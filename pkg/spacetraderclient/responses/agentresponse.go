@@ -17,10 +17,10 @@ func (o AgentResponse) Marshal() ([]byte, error) {
 }
 
 type AgentResponse struct {
-	Data AgentResponseData `json:"data"`
+	Data agentResponseData `json:"data"`
 }
 
-type AgentResponseData struct {
+type agentResponseData struct {
 	AccountID    string `json:"accountId"`
 	Symbol       string `json:"symbol"`
 	Headquarters string `json:"headquarters"`

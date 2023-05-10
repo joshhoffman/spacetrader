@@ -1,10 +1,10 @@
 package server
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/joshhoffman/spacetrader/pkg/spacetraderclient"
 )
@@ -39,9 +39,16 @@ func (s Server) StartServer() {
 		Addr:    fmt.Sprintf(":%d", serverPort),
 		Handler: mux,
 	}
-	if err := server.ListenAndServe(); err != nil {
-		if !errors.Is(err, http.ErrServerClosed) {
-			fmt.Printf("error running http server: %s\n", err)
-		}
-	}
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	go server.ListenAndServe()
+
+	wg.Add(1)
+	fs := http.FileServer(http.Dir("web/build"))
+	http.Handle("/", fs)
+	go http.ListenAndServe(":8888", nil)
+
+	wg.Wait()
 }

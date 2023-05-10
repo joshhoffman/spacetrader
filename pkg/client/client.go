@@ -40,14 +40,14 @@ func (c Client) MakeGetRequest(endpoint string, responseObject MarshalableObject
 		return nil, err
 	}
 
-	// println(string(resBody))
+	fmt.Println(string(resBody))
 
 	responseObject, err = responseObject.Unmarshal(resBody)
 
 	return responseObject, err
 }
 
-func (c Client) MakePostRequest(endpoint string, body []byte) (string, error) {
+func (c Client) MakePostRequest(endpoint string, body []byte, responseObject MarshalableObject) (string, error) {
 	requestUrl := fmt.Sprintf("%s%s", c.Url, endpoint)
 	bodyReader := bytes.NewReader(body)
 
@@ -56,6 +56,8 @@ func (c Client) MakePostRequest(endpoint string, body []byte) (string, error) {
 		fmt.Println("Error making request")
 		return "", err
 	}
+	authHeader := fmt.Sprintf("Bearer %s", c.Token)
+	req.Header.Set("Authorization", authHeader)
 	req.Header.Set("Content-Type", "application/json")
 
 	res, err := c.client.Do(req)

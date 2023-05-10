@@ -117,29 +117,6 @@ type mount struct {
 	Deposits     []string           `json:"deposits,omitempty"`
 }
 
-type nav struct {
-	SystemSymbol   string `json:"systemSymbol"`
-	WaypointSymbol string `json:"waypointSymbol"`
-	Route          route  `json:"route"`
-	Status         string `json:"status"`
-	FlightMode     string `json:"flightMode"`
-}
-
-type route struct {
-	Departure     departure `json:"departure"`
-	Destination   departure `json:"destination"`
-	Arrival       string    `json:"arrival"`
-	DepartureTime string    `json:"departureTime"`
-}
-
-type departure struct {
-	Symbol       string `json:"symbol"`
-	Type         string `json:"type"`
-	SystemSymbol string `json:"systemSymbol"`
-	X            int64  `json:"x"`
-	Y            int64  `json:"y"`
-}
-
 type reactor struct {
 	Symbol       string              `json:"symbol"`
 	Name         string              `json:"name"`

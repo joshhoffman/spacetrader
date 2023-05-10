@@ -29,7 +29,10 @@ func main() {
 
 	c := spacetraderclient.SpaceTraderClient{Callsign: callsign, Token: token}
 	c.Init()
-	c.Ships()
+	ships, _ := c.Ships()
+	// c.Ships()
+	shipId := ships.Data[0].Registration.Name
+	c.Orbit(shipId)
 
 	s := server.Server{}
 	s.StartServer()
